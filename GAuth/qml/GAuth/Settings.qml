@@ -17,7 +17,6 @@
 */
 
 import QtQuick 1.1
-import "Utils/Database.js" as Database
 
 QtObject {
     id: settings
@@ -25,13 +24,13 @@ QtObject {
     signal settingsLoaded
 
     // TODO: Use QSettings but some of the values like oauthToken & pocketPassword can not store as plain text
-    function loadSettings() {
+    function loadSettings() {/*
         var results = Database.getAllSettings()
         for (var s in results) {
             if (settings.hasOwnProperty(s)) {
                 settings[s] = results[s]
             }
-        }
+        }*/
         settingsLoaded()
     }
 
