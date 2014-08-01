@@ -51,12 +51,12 @@ Page {
 
     TextField {
         id: providerName
-        placeholderText: qsTr("Enter provider name...")
         text: providerNameValue
         width: viewProviderPage.width -10
         anchors {
             top: providerLabel.bottom
         }
+        readOnly: true
     }
 
     Label {
