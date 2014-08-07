@@ -9,6 +9,20 @@ Page {
     property int providerId
     property string providerNameValue
     property string providerSecretValue
+    property variant addProviderPage: AddProviderPage {}
+
+    QueryDialog {
+        id: deleteProviderDialog
+        titleText: qsTr("Delete request")
+        message: qsTr("Delete provider?")
+        acceptButtonText: qsTr("Delete")
+        rejectButtonText: qsTr("Cancel")
+
+        onAccepted: {
+            providerModel.deleteProvider(providerId)
+            window.pageStack.pop()
+        }
+    }
 
     tools: ToolBarLayout {
         ToolButtonWithTip {
@@ -24,10 +38,19 @@ Page {
             flat: true
             text: qsTr("Edit")
             onClicked: {
-                setProviderValues(window.addProviderPage, providerId, providerNameValue, providerSecretValue)
-                window.pageStack.push(window.addProviderPage)
+                setProviderValues(addProviderPage, providerId, providerNameValue, providerSecretValue)
+                window.pageStack.push(addProviderPage)
             }
         }
+
+        ToolButtonWithTip {
+            flat: true
+            text: qsTr("Delete")
+            onClicked: {
+                deleteProviderDialog.open()
+            }
+        }
+
 
     }
 
@@ -51,12 +74,12 @@ Page {
 
     TextField {
         id: providerName
-        placeholderText: qsTr("Enter provider name...")
         text: providerNameValue
         width: viewProviderPage.width -10
         anchors {
             top: providerLabel.bottom
         }
+        readOnly: true
     }
 
     Label {
@@ -76,10 +99,25 @@ Page {
         text: qGoogleAuth.generatePin(providerSecretValue)
     }
     Timer {
+        id: generatorTimer
         interval: 5000
-        running: true
+        running: false
         repeat: true
-        onTriggered: providerPIN.text = qGoogleAuth.generatePin(providerSecretValue)
+        onTriggered: {
+            providerPIN.text = qGoogleAuth.generatePin(providerSecretValue)
+        }
+    }
+
+    onStatusChanged: {
+        if (status === PageStatus.Activating)
+        {
+            generatorTimer.running = true
+        }
+
+        if (status === PageStatus.Deactivating)
+        {
+            generatorTimer.running = false
+        }
     }
 
     QGoogleAuth {

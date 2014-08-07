@@ -73,6 +73,9 @@ Page {
         anchors {
             top: providerSecretLabel.bottom
         }
+        onTextChanged: {
+            providerPIN.text = qGoogleAuth.generatePin(providerSecret.text)
+        }
     }
     Label {
         id: totpLabel
@@ -90,15 +93,31 @@ Page {
         }
     }
     Timer {
+        id: generatorTimer
         interval: 5000
-        running: true
+        running: false
         repeat: true
-        onTriggered: providerPIN.text = qGoogleAuth.generatePin(providerSecret.text)
+        onTriggered: {
+            providerPIN.text = qGoogleAuth.generatePin(providerSecret.text)
+        }
     }
 
     QGoogleAuth {
         id: qGoogleAuth
     }
+
+    onStatusChanged: {
+        if (status === PageStatus.Activating)
+        {
+            generatorTimer.running = true
+        }
+
+        if (status === PageStatus.Deactivating)
+        {
+            generatorTimer.running = false
+        }
+    }
+
 
     function accept()
     {
